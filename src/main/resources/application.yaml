@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/produto_db?createDatabaseIfNotExist=true
+    username: root
+    password: '@Lucas2007'
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
