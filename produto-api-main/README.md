@@ -1,38 +1,29 @@
 # Produto API — REST API com Spring Boot e MySQL
 
-API REST completa para gerenciamento de produtos, desenvolvida com Java, Spring Boot e MySQL.
+API REST para gerenciamento de produtos (CRUD completo), construída para praticar arquitetura em camadas com Spring Boot, Spring Data JPA e MySQL.
 
-## Tecnologias
+## Stack
 
 - Java 17
 - Spring Boot 3.5
-- Spring Data JPA
+- Spring Data JPA / Hibernate
 - MySQL
 - Lombok
 - Maven
 
-## Funcionalidades
-
-- Listar todos os produtos
-- Buscar produto por ID
-- Cadastrar novo produto
-- Atualizar produto existente
-- Deletar produto
-- Tratamento de erros com mensagens claras (404 para produto não encontrado)
-
-## Endpoints
+## O que a API faz
 
 | Método | Endpoint | Descrição |
 |---|---|---|
 | GET | `/api/produtos` | Lista todos os produtos |
 | GET | `/api/produtos/{id}` | Busca produto por ID |
 | POST | `/api/produtos` | Cadastra novo produto |
-| PUT | `/api/produtos/{id}` | Atualiza produto |
-| DELETE | `/api/produtos/{id}` | Deleta produto |
+| PUT | `/api/produtos/{id}` | Atualiza produto existente |
+| DELETE | `/api/produtos/{id}` | Remove produto |
 
-## Exemplo de requisição
+**Exemplo — POST /api/produtos**
 
-**POST /api/produtos**
+Request:
 ```json
 {
     "name": "Notebook",
@@ -41,7 +32,7 @@ API REST completa para gerenciamento de produtos, desenvolvida com Java, Spring 
 }
 ```
 
-**Resposta:**
+Response (201 Created):
 ```json
 {
     "id": 1,
@@ -53,29 +44,31 @@ API REST completa para gerenciamento de produtos, desenvolvida com Java, Spring 
 
 ## Arquitetura
 
-O projeto segue o padrão de camadas:
+Camadas separadas por responsabilidade:
 
 ```
-Controller  →  recebe as requisições HTTP
+Controller  →  recebe e valida a requisição HTTP
 Service     →  regras de negócio
-Repository  →  acesso ao banco de dados
+Repository  →  acesso ao banco (Spring Data JPA)
 ```
 
-## Como rodar o projeto
+Erros são centralizados em um `@ControllerAdvice` (`GlobalExceptionHandler`), em vez de tratamento espalhado em cada endpoint.
+
+## Como rodar localmente
 
 ### Pré-requisitos
 - Java 17+
 - MySQL 8+
 - Maven
 
-### Configuração
+### Passos
 
 1. Clone o repositório:
 ```bash
 git clone https://github.com/LucasPossamaiDev/produto-api.git
 ```
 
-2. Configure o banco de dados em `src/main/resources/application.yaml`:
+2. Configure suas credenciais de banco em `src/main/resources/application.yaml`:
 ```yaml
 spring:
   datasource:
@@ -91,8 +84,25 @@ mvn spring-boot:run
 
 4. Acesse: `http://localhost:8080/api/produtos`
 
+## O que pratiquei neste projeto
+
+- Construção de uma API REST do zero com Spring Boot, incluindo os cinco verbos HTTP básicos de um CRUD.
+- Separação em camadas (Controller / Service / Repository) e injeção de dependência via construtor.
+- Mapeamento objeto-relacional com JPA/Hibernate (`@Entity`, `@GeneratedValue`, geração automática de tabela).
+- Tratamento centralizado de exceções com `@ControllerAdvice`.
+- Uso do Lombok para reduzir boilerplate (`@Data`).
+- Configuração de projeto Maven e gerenciamento de dependências.
+
+## Limitações atuais e próximos passos
+
+Sendo direto sobre o estado do projeto, porque isso é mais útil do que vender algo que não existe ainda:
+
+- **Sem DTOs**: a entidade JPA é exposta diretamente na API. Próximo passo é criar `ProdutoRequestDTO` / `ProdutoResponseDTO` para não acoplar o contrato da API ao modelo do banco.
+- **Tratamento de erro genérico demais**: hoje qualquer `RuntimeException` vira 404, o que mascara bugs reais. Trocar por exceções customizadas (`ProdutoNaoEncontradoException`) com status HTTP específicos por caso.
+- **Validação não implementada**: a dependência `spring-boot-starter-validation` já está no projeto, mas ainda falta anotar os campos (`@NotBlank`, `@Positive`) e usar `@Valid` no controller.
+
 ## Autor
 
-**Lucas Possamai de Souza**  
-Cursando Engenharia de Software  
+**Lucas Possamai de Souza**
+Cursando Engenharia de Software
 [GitHub](https://github.com/LucasPossamaiDev)
